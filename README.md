@@ -60,5 +60,7 @@ For a more complete picture, please refer to the upcoming seminar paper.
 ## Contact
 
 Thomas Reimer
+
 HTW Berlin / Public Design
+
 thomas.reimer@student.htw-berlin.de
