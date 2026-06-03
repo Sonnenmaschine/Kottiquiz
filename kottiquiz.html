@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemachte Bilder – Narrative eines Ortes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* KERN neutral palette */
+  --black: #0a0a0a;
+  --white: #f7f5f0;
+  --gray:  #dfe1ea;  /* neutral-100 */
+  --gray2: #e8e9ef;  /* neutral-050 */
+  --gray3: #f3f4f7;  /* neutral-025 */
+  --mid:   #454b6b;  /* neutral-700 – 7.80:1 on white ✓ */
+  --hover: #30344f;  /* neutral-800 – hover bg for dark btns, white text 11.14:1 ✓ */
+
+  /* KERN feedback colors (turquois/red/orange palette) */
+  --success:         #007155;  /* turq-600 – 5.52:1 on white ✓ */
+  --success-bg:      #cdf2e4;  /* turq-050 */
+  --success-on-dark: #16a884;  /* turq-400 – 6.57:1 on black ✓ */
+  --danger:          #c31c13;  /* red-600 */
+  --danger-bg:       #fee4e0;  /* red-050 */
+  --warning:         #925400;  /* orange-600 */
+  --warning-bg:      #ffe7b6;  /* orange-050 */
+
+  /* compare chip colors */
+  --blue:        #185fa5;
+  --blue-light:  #e6f1fb;
+  --amber:       #8a5a00;
+  --amber-light: #faeeda;
+
+  --border: 2px solid #0a0a0a;
+  --border-thick: 3px solid #0a0a0a;
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+#app { min-height: 100vh; display: flex; flex-direction: column; }
+
+header {
+  background: var(--black);
+  color: var(--white);
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  border-bottom: var(--border-thick);
+}
+
+.logo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 1rem 1.5rem;
+  border-right: var(--border);
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+nav {
+  display: flex;
+  align-items: stretch;
+}
+
+nav button {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray);
+  background: transparent;
+  border: none;
+  border-left: 2px solid #2a2a2a;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+nav button:hover { background: var(--hover); color: var(--white); }
+nav button.active { background: var(--white); color: var(--black); }
+
+main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Ensure minimum tap target size for touch */
+.btn-submit, .btn-next, nav button, .word-chip, .headline-btn {
+  min-height: 44px;
+}
+.word-chip { display: inline-flex; align-items: center; }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+.start-hero {
+  padding: 3rem 0 2.5rem;
+  border-bottom: var(--border-thick);
+  margin-bottom: 2rem;
+}
+
+.start-hero h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.quiz-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: var(--border-thick);
+}
+
+.quiz-card {
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  display: flex;
+  flex-direction: column;
+  border-right: var(--border);
+}
+
+.quiz-card:last-child { border-right: none; }
+.quiz-card:hover { background: var(--black); color: var(--white); }
+.quiz-card:hover .card-num { color: var(--gray2); }
+
+.quiz-card::before { display: none; }
+
+.card-num { font-size: 2rem; font-weight: 900; line-height: 1; color: var(--mid); margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+
+.card-inner { flex: 1; }
+
+.quiz-card h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.75rem;
+  min-height: 2.6rem;
+}
+
+.quiz-card p {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--mid);
+}
+
+.quiz-card:hover p { color: var(--gray); }
+
+.card-arrow {
+  display: block;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-link {
+  margin-top: 2rem;
+  border-top: var(--border);
+  padding-top: 1rem;
+}
+
+.admin-link button {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.72rem;
+  color: var(--mid);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 400;
+}
+
+.quiz-header { margin-bottom: 1.5rem; }
+
+.quiz-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 0.4rem;
+}
+
+.quiz-header h2, h2.quiz-header {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.quiz-header p {
+  margin-top: 0.6rem;
+  color: var(--mid);
+  font-size: 0.88rem;
+  font-weight: 400;
+  max-width: 620px;
+}
+
+.progress-bar {
+  margin: 1.5rem 0;
+  background: var(--gray2);
+  border: var(--border);
+  height: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--black);
+  transition: width 0.4s ease;
+}
+
+.q1-question-box {
+  border: var(--border-thick);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.question-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mid);
+  margin-bottom: 1.25rem;
+}
+
+.headline-choices { display: flex; flex-direction: column; gap: 0; }
+
+.headline-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+  background: var(--white);
+  border: var(--border);
+  border-bottom: none;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  color: var(--black);
+}
+
+.headline-btn:last-child { border-bottom: var(--border); }
+.headline-btn:hover { background: var(--black); color: var(--white); }
+
+.headline-btn.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.headline-btn.wrong { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+.headline-btn.reveal { opacity: 0.45; }
+
+.feedback-box {
+  background: var(--black);
+  color: var(--white);
+  border: var(--border-thick);
+  padding: 1.25rem 1.5rem;
+  margin-top: 1rem;
+  display: none;
+}
+
+.feedback-box.show { display: block; }
+
+.feedback-tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 0.6rem;
+}
+
+.feedback-box strong { color: #f0c060; font-weight: 700; }
+.feedback-box p { font-size: 0.88rem; line-height: 1.65; font-weight: 300; }
+.feedback-key { font-size: 0.95rem; line-height: 1.6; font-weight: 500; margin-bottom: 0.75rem; }
+.feedback-detail { font-size: 0.82rem; line-height: 1.65; font-weight: 300; color: var(--gray); }
+.feedback-toggle { margin-top: 0.75rem; display: block; }
+.feedback-toggle summary { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); cursor: pointer; padding: 0.4rem 0; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
+.feedback-toggle summary::before { content: '↓'; font-size: 0.8rem; }
+.feedback-toggle[open] summary::before { content: '↑'; }
+.feedback-toggle summary::-webkit-details-marker { display: none; }
+
+.btn-next {
+  margin-top: 1rem;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--black);
+  color: var(--white);
+  border: var(--border-thick);
+  padding: 0.8rem 2rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  display: none;
+}
+
+.btn-next.show { display: inline-block; }
+.btn-next:hover { background: var(--hover); }
+
+.btn-submit {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--black);
+  color: var(--white);
+  border: var(--border-thick);
+  padding: 0.8rem 2rem;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.btn-submit:hover { background: var(--hover); }
+
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: var(--border);
+}
+
+.word-cloud-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  align-items: flex-start;
+}
+
+.word-chip {
+  font-family: 'Noto Sans', sans-serif;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  transition: background 0.1s, color 0.1s;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.word-chip:hover { background: var(--gray2); }
+.word-chip.neutral { background: var(--white); color: var(--black); }
+.word-chip.selected-active { background: var(--black); color: var(--white); }
+.word-chip.selected-lokal { background: var(--black); color: var(--white); }
+.word-chip.selected-boulevard { background: var(--danger); color: var(--white); border-color: var(--danger); }
+.word-chip.selected-neutral { background: var(--mid); color: var(--white); border-color: var(--mid); }
+
+.q2-step1-done { opacity: 0.4; pointer-events: none; }
+.q2-step-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: var(--border);
+}
+
+.q2-step-num {
+  width: 28px;
+  height: 28px;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.q2-step-hint {
+  font-size: 0.85rem;
+  color: var(--mid);
+  font-weight: 400;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.q2-chip-counter {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mid);
+  margin-bottom: 0.25rem;
+}
+
+.q2-divider {
+  border: none;
+  border-top: var(--border-thick);
+  margin: 2rem 0;
+}
+
+.q2-compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: var(--border-thick);
+  margin: 1rem 0;
+}
+
+.q2-compare-col {
+  padding: 1.25rem;
+}
+
+.q2-compare-col:first-child { border-right: var(--border); }
+
+.q2-compare-col h4 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 0.75rem;
+}
+
+.q2-chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.chip-small {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 3px 9px;
+  border: 1.5px solid;
+}
+
+.q2-both { background: var(--black); color: var(--white); border-color: var(--black); }
+.q2-only-personal { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
+.q2-only-media { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+.boulevard { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+.lokal { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.match { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+
+.q2-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mid);
+}
+
+.q2-legend-row span { display: flex; align-items: center; gap: 0.35rem; }
+.q2-legend-dot { width: 10px; height: 10px; flex-shrink: 0; }
+
+.q2-observation {
+  margin-top: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--black);
+  color: var(--white);
+  border: var(--border-thick);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+.q2-observation strong { color: #f0c060; font-weight: 700; }
+
+.narrative-cards { display: flex; flex-direction: column; gap: 0; border: var(--border-thick); margin-bottom: 1.5rem; }
+
+.narrative-card {
+  background: var(--white);
+  border-bottom: var(--border);
+  padding: 1.25rem 1.5rem;
+  cursor: grab;
+  transition: background 0.1s;
+  position: relative;
+}
+
+.narrative-card:last-child { border-bottom: none; }
+.narrative-card:active { cursor: grabbing; }
+.narrative-card.dragging { opacity: 0.35; background: var(--gray2); }
+.narrative-card.drag-over { background: var(--hover); color: var(--white); }
+
+.q3-rank-display { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem; }
+
+.rank-badge {
+  width: 28px;
+  height: 28px;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.narrative-card.drag-over .rank-badge { background: var(--white); color: var(--hover); }
+
+.narrative-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding-right: 2.5rem;
+}
+
+.narrative-card p {
+  font-size: 0.82rem;
+  color: var(--mid);
+  line-height: 1.55;
+  font-weight: 400;
+  padding-right: 2.5rem;
+}
+
+.narrative-card.drag-over p { color: var(--gray); }
+
+.drag-handle {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray);
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+}
+
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mid);
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  display: block;
+}
+
+.submit-section { padding: 1.5rem 0; }
+
+.success-message {
+  display: none;
+  background: var(--success-bg);
+  border: 2px solid var(--success);
+  padding: 1rem 1.5rem;
+  margin-top: 1rem;
+  color: var(--success);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.success-message.show { display: block; }
+
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: var(--border-thick); padding-bottom: 1rem; }
+
+.admin-header h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.btn-export {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--success);
+  color: var(--white);
+  border: 2px solid var(--success);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.btn-clear {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: none;
+  color: var(--danger);
+  border: 2px solid var(--danger);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: var(--border-thick); margin-bottom: 2rem; }
+
+.stat-card { padding: 1.25rem; border-right: var(--border); text-align: center; }
+.stat-card:last-child { border-right: none; }
+
+.stat-num {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--black);
+  display: block;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mid); }
+
+.session-item { padding: 1rem 0; border-bottom: var(--border); font-size: 0.85rem; }
+
+.session-meta {
+  display: flex;
+  gap: 1rem;
+  color: var(--mid);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+}
+
+.tabs-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border: var(--border-thick);
+  width: 100%;
+}
+
+.tab-btn {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: none;
+  border: none;
+  border-right: var(--border);
+  padding: 0.6rem 0.5rem;
+  cursor: pointer;
+  color: var(--mid);
+  flex: 1;
+  text-align: center;
+}
+
+.tab-btn:last-child { border-right: none; }  /* container border covers right edge */
+.tab-btn.active { background: var(--black); color: var(--white); }
+.tab-btn:hover:not(.active) { background: var(--gray2); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.detail-item { color: var(--mid); }
+.detail-item strong { color: var(--black); font-weight: 700; }
+
+@media (max-width: 1024px) {
+  main { padding: 1.5rem; }
+  .start-hero h1 { font-size: 2.2rem; }
+  .quiz-header h2, h2.quiz-header { font-size: 1.6rem; }
+}
+
+@media (max-width: 768px) {
+  .logo { font-size: 0.82rem; padding: 0.75rem 1rem; }
+  nav button { font-size: 0.68rem; padding: 0 0.85rem; letter-spacing: 0.04em; }
+  main { padding: 1.25rem; }
+  .start-hero { padding: 2rem 0 1.5rem; }
+  .start-hero h1 { font-size: 1.8rem; }
+  .quiz-cards { grid-template-columns: 1fr; }
+  .quiz-card { border-right: none; border-bottom: var(--border); }
+  .quiz-card:last-child { border-bottom: none; }
+  .quiz-header h2, h2.quiz-header { font-size: 1.4rem; }
+  .q1-question-box { padding: 1.25rem 1rem; }
+  .headline-btn { font-size: 1rem; padding: 0.9rem 1rem; }
+  .feedback-box { padding: 1rem; }
+  .q2-compare-row { grid-template-columns: 1fr; }
+  .q2-compare-col:first-child { border-right: none; border-bottom: var(--border); }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .narrative-card { padding: 1rem 1.25rem; touch-action: none; }
+  .narrative-card h3 { font-size: 0.88rem; }
+  .narrative-card p { font-size: 0.78rem; }
+  .btn-submit, .btn-next { padding: 0.85rem 1.5rem; font-size: 0.75rem; }
+  .word-chip { padding: 0.55rem 1rem; font-size: 0.88rem; }
+  .tabs-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab-btn { white-space: nowrap; flex-shrink: 0; }
+}
+
+@media (max-width: 480px) {
+  header { flex-wrap: wrap; }
+  .logo { border-right: none; border-bottom: 2px solid #2a2a2a; flex: 1 0 100%; }
+  nav { width: 100%; border-bottom: 2px solid #2a2a2a; overflow-x: auto; }
+  nav button { border-left: none; border-right: 2px solid #2a2a2a; padding: 0.6rem 1rem; flex-shrink: 0; }
+  nav button:last-child { border-right: none; }
+  .start-hero h1 { font-size: 1.5rem; }
+  .stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo" onclick="showScreen('start')">Gemachte Bilder – Narrative eines Ortes</div>
+    <nav>
+      <button onclick="showScreen('q1')">Schlagzeilen</button>
+      <button onclick="showScreen('q2')">Begriffe</button>
+      <button onclick="showScreen('q3')">Narrative</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="screen-start" class="screen active">
+      <div class="start-hero">
+        <h1>Gemachte Bilder –<br>Narrative eines Ortes</h1>
+      </div>
+      <div class="quiz-cards">
+        <div class="quiz-card q1" onclick="showScreen('q1')">
+          <div class="card-num">01</div>
+          <div class="card-inner">
+            <h2>Welche Schlagzeile ist echt?</h2>
+            <p>Echte und erfundene Schlagzeilen – erkennst du den Unterschied? Und was sagt das über mediale Dramatisierung?</p>
+          </div>
+          <span class="card-arrow">Starten →</span>
+        </div>
+        <div class="quiz-card q2" onclick="showScreen('q2')">
+          <div class="card-num">02</div>
+          <div class="card-inner">
+            <h2>Wie beschreibst du den Kotti?</h2>
+            <p>Begriffe wählen – zuerst deine eigene Assoziation, dann deine Medienerwartung. Vergleiche danach die beiden Auswahlen.</p>
+          </div>
+          <span class="card-arrow">Starten →</span>
+        </div>
+        <div class="quiz-card q3" onclick="showScreen('q3')">
+          <div class="card-num">03</div>
+          <div class="card-inner">
+            <h2>Narrative sortieren</h2>
+            <p>Bringe vier Erzählweisen über den Kotti in die Reihenfolge, wie häufig du sie in der Medienberichterstattung erwartest.</p>
+          </div>
+          <span class="card-arrow">Starten →</span>
+        </div>
+      </div>
+      <div class="admin-link">
+        <button onclick="showScreen('admin')">Ergebnisse auswerten (Ausstellungsteam)</button>
+      </div>
+    </div>
+
+    <div id="screen-q1" class="screen">
+      <div class="quiz-header">
+        <h2 class="quiz-header" style="font-size:2rem; font-weight:900; text-transform:uppercase; line-height:1.1">Welche Schlagzeile ist echt?</h2>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="q1-progress" style="width:0%"></div></div>
+      <div id="q1-container"></div>
+      <button class="btn-next" id="q1-next" onclick="nextQ1()">Weiter →</button>
+      <div id="q1-done" style="display:none; padding:2rem 0;">
+        <p style="font-size:1.4rem; font-weight:900; text-transform:uppercase; margin-bottom:0.5rem">Alle 5 Fragen beantwortet.</p>
+        <p style="color:var(--mid); font-size:0.88rem; margin-bottom:1.5rem">Deine Antworten wurden gespeichert.</p>
+        <button class="btn-next show" onclick="showScreen('q2')">Weiter zu Begriffe →</button>
+      </div>
+    </div>
+
+    <div id="screen-q2" class="screen">
+      <div class="quiz-header">
+        <h2 style="font-size:2rem; font-weight:900; text-transform:uppercase; line-height:1.1">Begriffe und Medienbilder</h2>
+      </div>
+
+      <div id="q2-step1">
+        <div class="q2-step-label">
+          <span class="q2-step-num">1</span>
+          Welche Begriffe verbindest du mit dem Kotti?
+        </div>
+        <div id="q2-counter1" class="q2-chip-counter">Wähle bis zu fünf Begriffe</div>
+        <div class="word-cloud-grid" id="q2-chips1"></div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;align-items:center">
+          <input type="text" id="q2-custom1" placeholder="Eigener Begriff..." style="font-family:inherit;font-size:0.85rem;border:2px solid #0a0a0a;padding:0.45rem 0.9rem;background:#f7f5f0;color:#0a0a0a;outline:none;flex:1;max-width:220px;min-height:44px" onkeydown="if(event.key==='Enter')addCustomChip('q2-chips1','q2-custom1','personal')">
+          <button onclick="addCustomChip('q2-chips1','q2-custom1','personal')" style="font-family:inherit;font-size:0.75rem;font-weight:700;text-transform:uppercase;background:#0a0a0a;color:#f7f5f0;border:3px solid #0a0a0a;padding:0.45rem 0.9rem;cursor:pointer;min-height:44px">+</button>
+        </div>
+        <button class="btn-submit" onclick="q2ToStep2()" style="margin-top:1rem">Weiter zu Schritt 2 →</button>
+      </div>
+
+      <div class="q2-divider" id="q2-divider" style="display:none"></div>
+
+      <div id="q2-step2" style="display:none">
+        <div class="q2-step-label">
+          <span class="q2-step-num">2</span>
+          Welche Begriffe erwartest du in den Medien?
+        </div>
+        <div id="q2-counter2" class="q2-chip-counter">Wähle bis zu fünf Begriffe</div>
+        <div class="word-cloud-grid" id="q2-chips2"></div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;align-items:center">
+          <input type="text" id="q2-custom2" placeholder="Eigener Begriff..." style="font-family:inherit;font-size:0.85rem;border:2px solid #0a0a0a;padding:0.45rem 0.9rem;background:#f7f5f0;color:#0a0a0a;outline:none;flex:1;max-width:220px;min-height:44px" onkeydown="if(event.key==='Enter')addCustomChip('q2-chips2','q2-custom2','media')">
+          <button onclick="addCustomChip('q2-chips2','q2-custom2','media')" style="font-family:inherit;font-size:0.75rem;font-weight:700;text-transform:uppercase;background:#0a0a0a;color:#f7f5f0;border:3px solid #0a0a0a;padding:0.45rem 0.9rem;cursor:pointer;min-height:44px">+</button>
+        </div>
+        <button class="btn-submit" onclick="submitQ2()" style="margin-top:1rem">Vergleichen →</button>
+      </div>
+
+      <div class="q2-divider" id="q2-divider2" style="display:none"></div>
+
+      <div id="q2-results" style="display:none">
+        <div class="q2-step-label" style="border-color:var(--black)">
+          <span class="q2-step-num">↓</span>
+          Dein Vergleich
+        </div>
+        <div id="q2-result-inner"></div>
+        <div style="margin-top:1.5rem; border:var(--border-thick); padding:1.25rem 1.5rem;">
+          <div style="font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--mid); margin-bottom:0.75rem; padding-bottom:0.5rem; border-bottom:2px solid var(--black)">Welche Begriffe tauchen laut Medienanalyse besonders häufig auf?</div>
+          <div style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.75rem">
+            <span class="chip-small boulevard">Brennpunkt</span>
+            <span class="chip-small boulevard">Kriminalität</span>
+            <span class="chip-small boulevard">Angst</span>
+            <span class="chip-small boulevard">Polizei</span>
+            <span class="chip-small boulevard">Drogen</span>
+            <span class="chip-small boulevard">Verwahrlosung</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--mid); line-height:1.6; font-weight:400">In der Analyse von 40 Artikeln aus RBB, Tagesspiegel, Berliner Zeitung, Berliner Morgenpost und BZ (2024–2025) dominieren Begriffe aus dem Kriminalitäts- und Sicherheitsumfeld. Begriffe wie Nachbarschaft, Alltagsleben oder soziale Arbeit erscheinen deutlich seltener als eigenständige Themen.</p>
+        </div>
+        <div style="margin-top:1.5rem; display:flex; gap:0.75rem; flex-wrap:wrap">
+          <button class="btn-next show" onclick="showScreen('q3')" style="margin-top:0">Weiter zu Narrative →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-q3" class="screen">
+      <div class="quiz-header">
+        <h2 style="font-size:2rem; font-weight:900; text-transform:uppercase; line-height:1.1">Narrative sortieren</h2>
+      </div>
+
+      <div style="border:var(--border-thick); padding:1rem 1.25rem; margin-bottom:1.5rem; background:var(--gray3);">
+        <p style="font-size:0.88rem; font-weight:500; line-height:1.6; margin-bottom:0.25rem">Bringe die vier Narrative in die Reihenfolge, wie häufig sie deiner Einschätzung nach in der Medienberichterstattung auftauchen – die häufigste zuerst.</p>
+        <p style="font-size:0.78rem; color:var(--mid); font-weight:400">Verschieben: ↑ ↓ Buttons nutzen oder Karten ziehen.</p>
+      </div>
+
+      <div class="section-label">Häufigste Erzählung zuerst ↓</div>
+      <div class="narrative-cards" id="q3-cards"></div>
+
+      <label class="field-label">Woher beziehst du deine Informationen zum Kotti? <span style="font-weight:400; text-transform:none; letter-spacing:0">(Mehrfachauswahl)</span></label>
+      <div id="q3-source-btns">
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem">
+          <button class="word-chip neutral" onclick="toggleSource(this, 'Social Media')">Social Media</button>
+          <button class="word-chip neutral" onclick="toggleSource(this, 'Gedruckte Presse')">Gedruckte Presse</button>
+          <button class="word-chip neutral" onclick="toggleSource(this, 'Fernsehen')">Fernsehen</button>
+          <button class="word-chip neutral" onclick="toggleSource(this, 'Radio/Podcasts')">Radio / Podcasts</button>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem">
+          <button class="word-chip neutral" onclick="toggleSource(this, 'Ich wohne in der Nähe')">Ich wohne in der Nähe</button>
+          <button class="word-chip neutral" onclick="toggleSource(this, 'Ich fahre oft über den Kotti')">Ich fahre oft über den Kotti</button>
+        </div>
+      </div>
+
+      <div class="submit-section">
+        <button class="btn-submit" onclick="submitQ3()">Antworten speichern</button>
+        <div id="q3-reveal" style="display:none; margin-top:2rem; border: 3px solid var(--black); padding:1.5rem;">
+          <div style="font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--mid); margin-bottom:1rem; padding-bottom:0.5rem; border-bottom: 2px solid var(--black)">So verteilt sich die Berichterstattung – laut Medienanalyse</div>
+          <div id="q3-reveal-order"></div>
+          <p style="font-size:0.82rem; color:var(--mid); margin-top:1.25rem; font-weight:400; line-height:1.6">Kriminalität als Narrativ dominiert klar – rund zwei Drittel der ausgewerteten Artikel beschäftigen sich hauptsächlich damit. Alltagsleben und Nachbarschaftserfahrungen erscheinen am seltensten als eigenständige Erzählung.</p>
+        </div>
+        <div id="q3-success" style="display:none; margin-top:2rem; border:var(--border-thick); padding:2rem 1.5rem; background:var(--black); color:var(--white);">
+          <div style="font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--gray); margin-bottom:1rem">Danke für deine Teilnahme</div>
+          <p style="font-size:1.1rem; font-weight:700; line-height:1.4; margin-bottom:0.5rem">Deine Antworten wurden gespeichert.</p>
+          <p style="font-size:0.85rem; font-weight:300; color:var(--gray); line-height:1.6; margin-bottom:1.5rem">Du hast alle drei Formate abgeschlossen. Schau dir gerne die Ausstellung weiter an – und hinterlasse uns ein Feedback auf der Pinnwand.</p>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-admin" class="screen">
+      <div class="admin-header">
+        <h2>Auswertung</h2>
+        <div>
+          <button class="btn-export" onclick="exportData()">CSV exportieren</button>
+          <button class="btn-clear" onclick="clearData()">Daten löschen</button>
+        </div>
+      </div>
+<div style="display:inline-flex;align-items:baseline;gap:0.5rem;border:var(--border-thick);padding:0.6rem 1.25rem;margin-bottom:1.5rem">
+        <span style="font-size:1.8rem;font-weight:900;line-height:1" id="admin-total">0</span>
+        <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--mid)">Sessions gesamt</span>
+      </div>
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="switchTab('tab-overview', event)">Überblick</button>
+        <button class="tab-btn" onclick="switchTab('tab-q1', event)">Quiz 1</button>
+        <button class="tab-btn" onclick="switchTab('tab-q2', event)">Quiz 2</button>
+        <button class="tab-btn" onclick="switchTab('tab-q3', event)">Quiz 3</button>
+        <button class="tab-btn" onclick="switchTab('tab-sessions', event)">Alle Sessions</button>
+      </div>
+      <div class="tab-content active" id="tab-overview">
+        <div id="admin-q1-summary"></div>
+        <div id="admin-q2-summary" style="margin-top:1.5rem"></div>
+        <div id="admin-q3-summary" style="margin-top:1.5rem"></div>
+      </div>
+      <div class="tab-content" id="tab-q1"><div id="admin-q1-detail"></div></div>
+      <div class="tab-content" id="tab-q2"><div id="admin-q2-detail"></div></div>
+      <div class="tab-content" id="tab-q3"><div id="admin-q3-detail"></div></div>
+      <div class="tab-content" id="tab-sessions"><div id="admin-sessions"></div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const Q1_QUESTIONS = [
+  {
+    id: 'q1a',
+    prompt: 'Erkennst du, welche Schlagzeile über den Kotti echt ist?',
+    headlines: [
+      { text: 'Kriminalität explodiert: Der Platz der Gesetzlosen', real: true, origin: 'BZ, 2023' },
+      { text: 'Bestandsaufnahme: Heimat der Gesetzlosen', real: false, origin: 'Berliner Zeitung, 2020' }
+    ],
+    feedback: {
+      mechanic: 'Gleicher Mechanismus, anderer Ort',
+      real_note: '"Platz der Gesetzlosen" ist eine echte BZ-Schlagzeile über den Kotti. Die Formulierung verwandelt einen Ort in ein Symbol – ohne Beleg, ohne Differenzierung.',
+      invented_note: 'Diese Schlagzeile ist echt – aber über den Görlitzer Park. Die Berliner Zeitung titelte 2020 \"Heimat der Gesetzlosen\" über den Görli. Nur der Ortsname wurde ausgetauscht. Das Muster ist dasselbe.'
+    }
+  },
+  {
+    id: 'q1b',
+    prompt: 'Erkennst du, welche Schlagzeile über den Kotti echt ist?',
+    headlines: [
+      { text: 'Platz der Verdammten', real: true, origin: 'Spiegel, 2022' },
+      { text: 'Kotti bleibt Kotti: Unser Zuhause, unser Kiez', real: false, origin: 'Erfunden' }
+    ],
+    feedback: {
+      mechanic: 'Boulevard- vs. lokale Perspektive',
+      real_note: '"Platz der Verdammten" ist eine echte Spiegel-Schlagzeile. Die religiöse Konnotation macht den Ort zu etwas Unwiederbringlichem – die Menschen, die dort zu Hause sind, kommen nicht vor.',
+      invented_note: 'Diese Schlagzeile ist erfunden – angelehnt an die Sprache von Anwohner:innen, die den Kotti als ihren Kiez beschreiben. Diese Perspektive taucht in überregionalen Medien kaum als Schlagzeile auf.'
+    }
+  },
+  {
+    id: 'q1c',
+    prompt: 'Erkennst du, welche Schlagzeile über den Kotti echt ist?',
+    headlines: [
+      { text: 'Liebeserklärung ans Kottbusser Tor: Kotti, mon amour', real: true, origin: 'taz, 2023' },
+      { text: 'Kotti: Wo die Stadt ihre Kontrolle verloren hat', real: false, origin: 'Erfunden' }
+    ],
+    feedback: {
+      mechanic: 'Zwei Zeitungen, zwei Welten',
+      real_note: 'Die taz veröffentlichte tatsächlich eine Liebeserklärung ans Kottbusser Tor. Kein Ausrufezeichen, kein Superlativ – stattdessen Zuneigung. Derselbe Ort, völlig andere Sprache.',
+      invented_note: 'Diese Schlagzeile ist erfunden – aber die Formulierung "Kontrolle verloren" ist ein echter journalistischer Topos, der für den Kotti und andere Orte regelmäßig verwendet wird. Behördenversagen als Dauerzustand.'
+    }
+  },
+  {
+    id: 'q1d',
+    prompt: 'Erkennst du, welche Schlagzeile über den Kotti echt ist?',
+    headlines: [
+      { text: 'Der gefährlichste Ort Deutschlands!', real: true, origin: 'Sat.1, 2022' },
+      { text: 'Kriminalitätsstatistik: Straftaten am Kottbusser Tor leicht rückläufig', real: false, origin: 'Erfunden' }
+    ],
+    feedback: {
+      mechanic: 'Superlativ vs. Statistik',
+      real_note: 'Sat.1 titelte tatsächlich "Der gefährlichste Ort Deutschlands!" – ohne Beleg, ohne Statistik, mit Ausrufezeichen. Der Superlativ klingt nach Fakt, ist aber eine Behauptung.',
+      invented_note: 'Diese nüchterne Statistikmeldung ist erfunden – aber sie zeigt, wie anders derselbe Ort beschrieben werden könnte: mit konkreten Zahlen statt Superlativen. Nüchterne Kriminalitätsberichte existieren, sind aber deutlich seltener als dramatisierende Schlagzeilen.'
+    }
+  },
+  {
+    id: 'q1e',
+    prompt: 'Erkennst du, welche Schlagzeile über den Kotti echt ist?',
+    headlines: [
+      { text: 'BVG will Kottbusser Tor zum Innovationsbahnhof machen', real: true, origin: 'RBB, 2025' },
+      { text: 'Kotti: Einer der gefährlichsten Orte Europas', real: false, origin: 'Erfunden' }
+    ],
+    feedback: {
+      mechanic: 'Lösungsorientierung vs. Eskalation',
+      real_note: 'Der RBB berichtete 2025 über konkrete BVG-Pläne für den Kotti – sachlich, lösungsorientiert. Solche Schlagzeilen existieren, gehen aber häufig in der Fülle negativer Berichterstattung unter.',
+      invented_note: 'Dieser Superlativ ist erfunden – aber er zeigt, wohin das Framing eskalieren könnte. "Gefährlichster Ort Deutschlands" war bereits eine echte Schlagzeile. Der Schritt zu Europa wäre klein.'
+    }
+  }
+];
+
+const Q2_WORDS = [
+  { word: 'Brennpunkt', type: 'boulevard' },
+  { word: 'Drogen', type: 'boulevard' },
+  { word: 'Kieztreff', type: 'lokal' },
+  { word: 'Angst', type: 'boulevard' },
+  { word: 'Schmutz', type: 'boulevard' },
+  { word: 'Nachbarschaft', type: 'lokal' },
+  { word: 'Gentrifizierung', type: 'neutral' },
+  { word: 'Soziale Arbeit', type: 'lokal' },
+  { word: 'Polizei', type: 'boulevard' },
+  { word: 'Kreuzberg', type: 'lokal' },
+  { word: 'Kriminalität', type: 'boulevard' },
+  { word: 'Aufenthaltsort', type: 'neutral' },
+  { word: 'Begegnungsort', type: 'lokal' },
+  { word: 'Verwahrlosung', type: 'boulevard' },
+  { word: 'Alltagsleben', type: 'lokal' }
+];
+
+const Q3_NARRATIVES = [
+  { id: 'kriminalitaet', title: 'Kotti als gefährlicher Ort', desc: 'Berichte über Messerstiche, Schläger, Drogenhandel. Kotti als Hotspot für Gewalt und Kriminalität – ein Ort, vor dem man warnt.' },
+  { id: 'revitalisierung', title: 'Kotti in Veränderung', desc: 'Neue Wachposten, Techno-DJs in der U-Bahn, Reinigungsstreifen: Kotti wird "besser gemacht". Hoffnung und Maßnahmen stehen im Vordergrund.' },
+  { id: 'soziales', title: 'Kotti als soziales Problem', desc: 'Spritzensammler:innen, Obdachlose, Drogenhilfe. Kotti als Spiegel sozialer Ungleichheit – mit Blick auf die, die dort leben und arbeiten.' },
+  { id: 'kiezleben', title: 'Kotti als Kiez und Alltag', desc: 'Markt, Migration, Nachbarschaft, Kultur. Kotti als lebendiger, vielschichtiger Ort – jenseits von Kriminalität oder Sanierung.' }
+];
+
+let q1State = { current: 0, answers: [], done: false };
+let q2State = { personal: [], media: [], submitted: false };
+let q3State = { order: [...Q3_NARRATIVES], sources: [], dragSrc: null };
+
+const STORAGE_KEY = 'kotti_quiz_results_v3';
+
+function loadResults() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveSession(session) {
+  const results = loadResults();
+  results.push(session);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+}
+
+function clearData() {
+  if (confirm('Wirklich alle Ergebnisse löschen?')) { localStorage.removeItem(STORAGE_KEY); try { renderAdmin(); } catch(e) {} }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('nav button').forEach((b,i) => {
+    b.classList.remove('active');
+    const map = ['q1','q2','q3'];
+    if (map[i] === id) b.classList.add('active');
+  });
+  if (id === 'q1') initQ1();
+  if (id === 'q2') initQ2();
+  if (id === 'q3') initQ3();
+  if (id === 'admin') renderAdmin();
+  window.scrollTo(0,0);
+}
+
+function initQ1() {
+  q1State = { current: 0, answers: [], done: false };
+  document.getElementById('q1-done').style.display = 'none';
+  document.getElementById('q1-container').style.display = 'block';
+  document.getElementById('q1-next').classList.remove('show');
+  renderQ1();
+}
+
+function renderQ1() {
+  const q = Q1_QUESTIONS[q1State.current];
+  document.getElementById('q1-progress').style.width = (q1State.current / Q1_QUESTIONS.length * 100) + '%';
+  // Shuffle display order randomly
+  const displayed = Math.random() < 0.5 ? [...q.headlines] : [q.headlines[1], q.headlines[0]];
+  document.getElementById('q1-container').innerHTML = `
+    <div class="q1-question-box">
+      <div class="question-text">Frage ${q1State.current + 1} von ${Q1_QUESTIONS.length} · ${q.prompt}</div>
+      <div class="headline-choices">
+        ${displayed.map((h,i) => `<button class="headline-btn" id="hbtn-${i}" onclick="answerQ1(${i}, ${h.real})" data-real="${h.real}">${h.text}</button>`).join('')}
+      </div>
+      <div class="feedback-box" id="q1-feedback">
+        <div class="feedback-tag">Medienmechanismus: <strong>${q.feedback.mechanic}</strong></div>
+        <p id="q1-feedback-text"></p>
+      </div>
+    </div>`;
+}
+
+function answerQ1(idx, correct) {
+  const q = Q1_QUESTIONS[q1State.current];
+  const btns = document.querySelectorAll('.headline-btn');
+  btns.forEach((btn, i) => {
+    if (btn.dataset.real === 'true') btn.classList.add('correct');
+    else if (i === idx) btn.classList.add('wrong');
+    else btn.classList.add('reveal');
+    btn.onclick = null;
+  });
+  q1State.answers.push({ questionId: q.id, correct, realHeadline: q.headlines.find(h => h.real).text });
+  const fb = document.getElementById('q1-feedback');
+  fb.classList.add('show');
+  const chosenNote = correct ? q.feedback.real_note : q.feedback.invented_note;
+  const otherNote = correct ? q.feedback.invented_note : q.feedback.real_note;
+  const realH = q.headlines.find(h => h.real);
+  const fakeH = q.headlines.find(h => !h.real);
+  const src1 = correct ? realH.origin : fakeH.origin;
+  const src2 = correct ? fakeH.origin : realH.origin;
+  const sourceTag = (src) => `<br><span style="font-size:0.72rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.06em; font-weight:700">Quelle: ${src}</span>`;
+
+  const firstSentence = (txt) => txt.match(/^[^.!?"]+[.!?"]/)?.[0] || txt;
+  const rest = (txt) => txt.slice(firstSentence(txt).length).trim();
+  const chosenFirst = firstSentence(chosenNote);
+  const chosenRest = rest(chosenNote);
+
+  // Full chosen note above fold, only other note + source in details
+  const aboveMore = `<p class="feedback-key"><strong style="${correct ? 'color:var(--success-on-dark)' : ''}">${correct ? '✓ Richtig.' : '→ Nicht ganz.'}</strong> ${chosenNote}</p><p class="feedback-detail" style="margin-top:0.4rem">${sourceTag(src1)}</p>`;
+  const insideMore = `<p class="feedback-detail">${otherNote}</p><p class="feedback-detail" style="margin-top:0.4rem">${sourceTag(src2)}</p>`;
+
+  document.getElementById('q1-feedback-text').innerHTML = `${aboveMore}
+    <details class="feedback-toggle">
+      <summary>Mehr zur anderen Schlagzeile</summary>
+      ${insideMore}
+    </details>`;
+  document.getElementById('q1-next').classList.add('show');
+}
+
+function nextQ1() {
+  q1State.current++;
+  document.getElementById('q1-next').classList.remove('show');
+  if (q1State.current >= Q1_QUESTIONS.length) {
+    document.getElementById('q1-progress').style.width = '100%';
+    document.getElementById('q1-container').style.display = 'none';
+    document.getElementById('q1-done').style.display = 'block';
+    saveSession({ type: 'q1', timestamp: new Date().toISOString(), score: q1State.answers.filter(a => a.correct).length, total: Q1_QUESTIONS.length, answers: q1State.answers });
+  } else { renderQ1(); }
+}
+
+function initQ2() {
+  q2State = { personal: [], media: [], submitted: false };
+  document.getElementById('q2-step1').style.display = 'block';
+  document.getElementById('q2-step1').classList.remove('q2-step1-done');
+  document.getElementById('q2-divider').style.display = 'none';
+  document.getElementById('q2-step2').style.display = 'none';
+  document.getElementById('q2-divider2').style.display = 'none';
+  document.getElementById('q2-results').style.display = 'none';
+  document.getElementById('q2-counter1').textContent = 'Wähle bis zu fünf Begriffe';
+  document.getElementById('q2-counter2').textContent = 'Wähle bis zu fünf Begriffe';
+  const shuffled = [...Q2_WORDS].sort(() => Math.random() - 0.5);
+  document.getElementById('q2-chips1').innerHTML = shuffled.map(w => `<button class="word-chip neutral" onclick="toggleWordStep(this,'${w.word}','personal')" data-word="${w.word}">${w.word}</button>`).join('');
+  document.getElementById('q2-chips2').innerHTML = shuffled.map(w => `<button class="word-chip neutral" onclick="toggleWordStep(this,'${w.word}','media')" data-word="${w.word}">${w.word}</button>`).join('');
+}
+
+function addCustomChip(containerId, inputId, step) {
+  const input = document.getElementById(inputId);
+  const word = input.value.trim();
+  if (!word) return;
+  const arr = step === 'personal' ? q2State.personal : q2State.media;
+  const counterId = step === 'personal' ? 'q2-counter1' : 'q2-counter2';
+  if (arr.length >= 5) return;
+  if (arr.includes(word)) { input.value = ''; return; }
+  arr.push(word);
+  const chip = document.createElement('button');
+  chip.className = 'word-chip selected-active';
+  chip.textContent = word;
+  chip.dataset.word = word;
+  chip.dataset.custom = 'true';
+  chip.onclick = () => toggleWordStep(chip, word, step);
+  document.getElementById(containerId).appendChild(chip);
+  document.getElementById(counterId).textContent = `${arr.length} von 5 gewählt`;
+  input.value = '';
+}
+
+function toggleWordStep(btn, word, step) {
+  if (q2State.submitted) return;
+  const arr = step === 'personal' ? q2State.personal : q2State.media;
+  const counterId = step === 'personal' ? 'q2-counter1' : 'q2-counter2';
+  const idx = arr.indexOf(word);
+  if (idx > -1) { arr.splice(idx, 1); btn.classList.remove('selected-active'); btn.classList.add('neutral'); }
+  else { if (arr.length >= 5) return; arr.push(word); btn.classList.remove('neutral'); btn.classList.add('selected-active'); }
+  document.getElementById(counterId).textContent = `${arr.length} von 5 gewählt`;
+}
+
+function q2ToStep2() {
+  if (q2State.personal.length < 1) { alert('Bitte wähle mindestens einen Begriff aus.'); return; }
+  document.getElementById('q2-step1').classList.add('q2-step1-done');
+  document.getElementById('q2-divider').style.display = 'block';
+  document.getElementById('q2-step2').style.display = 'block';
+  document.getElementById('q2-step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function submitQ2() {
+  if (q2State.media.length < 1) { alert('Bitte wähle mindestens einen Begriff aus.'); return; }
+  q2State.submitted = true;
+  const personal = new Set(q2State.personal), media = new Set(q2State.media);
+  const all = new Set([...personal, ...media]);
+  const cat = [...all].map(w => ({ w, inP: personal.has(w), inM: media.has(w) }));
+  const both = cat.filter(x => x.inP && x.inM);
+  const onlyP = cat.filter(x => x.inP && !x.inM);
+  const onlyM = cat.filter(x => !x.inP && x.inM);
+  const mBoul = q2State.media.filter(w => Q2_WORDS.find(x => x.word === w)?.type === 'boulevard').length;
+  const mPct = Math.round(mBoul / q2State.media.length * 100);
+  const pBoul = q2State.personal.filter(w => Q2_WORDS.find(x => x.word === w)?.type === 'boulevard').length;
+  const pPct = Math.round(pBoul / q2State.personal.length * 100);
+  let obs = both.length === 0
+    ? 'Deine persönliche Assoziation und deine Medienerwartung <strong>überschneiden sich gar nicht</strong>. Das zeigt, wie unterschiedlich eigene Wahrnehmung und mediales Bild sein können.'
+    : both.length >= 3
+    ? `Deine persönliche Assoziation und deine Medienerwartung <strong>decken sich stark</strong> – ${both.length} Begriffe tauchen in beiden auf. Das kann bedeuten, dass das mediale Bild die eigene Wahrnehmung geprägt hat – oder umgekehrt.`
+    : `Es gibt <strong>${both.length} gemeinsame${both.length===1?'n':''} Begriff${both.length===1?'':'e'}</strong> zwischen deiner Assoziation und deiner Medienerwartung – und einige deutliche Unterschiede.`;
+  if (mPct > pPct + 20) obs += ' In den Medien erwartest du deutlich mehr <strong>Negativbegriffe</strong> als du selbst mit dem Ort verbindest.';
+  else if (pPct > mPct + 20) obs += ' Du verbindest mehr <strong>Negativbegriffe</strong> mit dem Ort, als du in den Medien erwartest.';
+  document.getElementById('q2-result-inner').innerHTML = `
+    <div class="q2-legend-row">
+      <span><span class="q2-legend-dot" style="background:var(--black)"></span>In beiden Auswahlen</span>
+      <span><span class="q2-legend-dot" style="background:var(--amber)"></span>Nur persönlich</span>
+      <span><span class="q2-legend-dot" style="background:var(--blue)"></span>Nur Medienerwartung</span>
+    </div>
+    <div class="q2-compare-row">
+      <div class="q2-compare-col"><h4>Deine Assoziation</h4><div class="q2-chip-row">${both.map(x=>`<span class="chip-small q2-both">${x.w}</span>`).join('')}${onlyP.map(x=>`<span class="chip-small q2-only-personal">${x.w}</span>`).join('')}</div></div>
+      <div class="q2-compare-col"><h4>Deine Medienerwartung</h4><div class="q2-chip-row">${both.map(x=>`<span class="chip-small q2-both">${x.w}</span>`).join('')}${onlyM.map(x=>`<span class="chip-small q2-only-media">${x.w}</span>`).join('')}</div></div>
+    </div>
+    <div class="q2-observation">${obs}</div>`;
+  document.getElementById('q2-divider2').style.display = 'block';
+  document.getElementById('q2-results').style.display = 'block';
+  document.getElementById('q2-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  saveSession({ type: 'q2', timestamp: new Date().toISOString(), personal: q2State.personal, media: q2State.media, overlap: both.map(x=>x.w), onlyPersonal: onlyP.map(x=>x.w), onlyMedia: onlyM.map(x=>x.w), personalBoulevardPct: pPct, mediaBoulevardPct: mPct });
+}
+
+function initQ3() {
+  q3State = { order: [...Q3_NARRATIVES].sort(() => Math.random() - 0.5), sources: [], dragSrc: null };
+  document.getElementById('q3-success').style.display = 'none';
+  document.getElementById('q3-reveal').style.display = 'none';
+  document.querySelectorAll('#q3-source-btns .word-chip').forEach(b => { b.classList.remove('selected-active','selected-lokal'); b.classList.add('neutral'); });
+  renderQ3Cards();
+}
+
+function renderQ3Cards() {
+  document.getElementById('q3-cards').innerHTML = q3State.order.map((n,i) => `
+    <div class="narrative-card" draggable="true" data-id="${n.id}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropCard(event)" ondragleave="dragLeave(event)" ondragend="dragEnd(event)">
+      <div class="q3-rank-display"><div class="rank-badge">${i+1}</div><h3>${n.title}</h3></div>
+      <p>${n.desc}</p>
+      <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2px">
+        ${i > 0 ? `<button onclick="moveCard('${n.id}',-1)" style="font-family:'Noto Sans',sans-serif;font-size:0.7rem;font-weight:700;background:var(--black);color:var(--white);border:none;padding:3px 7px;cursor:pointer;line-height:1">↑</button>` : '<span style="width:24px"></span>'}
+        ${i < q3State.order.length-1 ? `<button onclick="moveCard('${n.id}',1)" style="font-family:'Noto Sans',sans-serif;font-size:0.7rem;font-weight:700;background:var(--black);color:var(--white);border:none;padding:3px 7px;cursor:pointer;line-height:1">↓</button>` : '<span style="width:24px"></span>'}
+      </div>
+    </div>`).join('');
+  addTouchDrag();
+}
+
+function moveCard(id, dir) {
+  const i = q3State.order.findIndex(n => n.id === id);
+  const j = i + dir;
+  if (j < 0 || j >= q3State.order.length) return;
+  [q3State.order[i], q3State.order[j]] = [q3State.order[j], q3State.order[i]];
+  renderQ3Cards();
+}
+
+function dragStart(e) { q3State.dragSrc = e.currentTarget; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', e.currentTarget.dataset.id); }
+function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (e.currentTarget !== q3State.dragSrc) e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function dragEnd(e) { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.narrative-card').forEach(c => c.classList.remove('drag-over')); }
+function dropCard(e) {
+  e.preventDefault();
+  const target = e.currentTarget;
+  target.classList.remove('drag-over');
+  if (target === q3State.dragSrc) return;
+  const si = q3State.order.findIndex(n => n.id === q3State.dragSrc.dataset.id);
+  const ti = q3State.order.findIndex(n => n.id === target.dataset.id);
+  const [moved] = q3State.order.splice(si, 1);
+  q3State.order.splice(ti, 0, moved);
+  renderQ3Cards();
+}
+
+// Touch support for drag-and-drop on tablets
+function addTouchDrag() {
+  let touchSrcId = null, touchClone = null, lastTarget = null;
+
+  document.getElementById('q3-cards').addEventListener('touchstart', e => {
+    const card = e.target.closest('.narrative-card');
+    if (!card) return;
+    touchSrcId = card.dataset.id;
+    card.classList.add('dragging');
+    touchClone = card.cloneNode(true);
+    touchClone.style.cssText = `position:fixed;opacity:0.85;pointer-events:none;z-index:999;width:${card.offsetWidth}px;border:var(--border-thick);background:var(--hover);color:var(--white);padding:1rem 1.25rem;`;
+    document.body.appendChild(touchClone);
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!touchSrcId) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    if (touchClone) { touchClone.style.left = (t.clientX - 20) + 'px'; touchClone.style.top = (t.clientY - 20) + 'px'; }
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const card = el?.closest('.narrative-card');
+    if (lastTarget && lastTarget !== card) lastTarget.classList.remove('drag-over');
+    if (card && card.dataset.id !== touchSrcId) { card.classList.add('drag-over'); lastTarget = card; }
+  }, { passive: false });
+
+  document.addEventListener('touchend', e => {
+    if (!touchSrcId) return;
+    if (touchClone) { touchClone.remove(); touchClone = null; }
+    document.querySelectorAll('.narrative-card').forEach(c => { c.classList.remove('dragging', 'drag-over'); });
+    if (lastTarget && lastTarget.dataset.id !== touchSrcId) {
+      const si = q3State.order.findIndex(n => n.id === touchSrcId);
+      const ti = q3State.order.findIndex(n => n.id === lastTarget.dataset.id);
+      const [moved] = q3State.order.splice(si, 1);
+      q3State.order.splice(ti, 0, moved);
+      renderQ3Cards();
+      addTouchDrag();
+    }
+    touchSrcId = null; lastTarget = null;
+  });
+}
+
+function toggleSource(btn, src) {
+  const idx = q3State.sources.indexOf(src);
+  if (idx > -1) { q3State.sources.splice(idx, 1); btn.classList.remove('selected-lokal'); btn.classList.add('neutral'); }
+  else { q3State.sources.push(src); btn.classList.remove('neutral'); btn.classList.add('selected-lokal'); }
+}
+
+function submitQ3() {
+  const session = { type: 'q3', timestamp: new Date().toISOString(), narrativeOrder: q3State.order.map(n => n.id), sources: q3State.sources };
+  saveSession(session);
+
+  // If Q1 and Q2 were also done this visit, tag them with sources
+  const results = loadResults();
+  const visitStart = Date.now() - 30 * 60 * 1000; // within last 30min
+  results.forEach((r, idx) => {
+    if ((r.type === 'q1' || r.type === 'q2') && !r.sources && new Date(r.timestamp).getTime() > visitStart) {
+      results[idx].sources = q3State.sources;
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+
+  document.getElementById('q3-success').style.display = 'block';
+  // ... rest of reveal
+  const mediaOrder = [
+    { id: 'kriminalitaet', title: 'Kotti als gefährlicher Ort', pct: 65, note: 'Dominiert die Berichterstattung deutlich – Kriminalität, Gewalt, Unsicherheit als Hauptthema.' },
+    { id: 'revitalisierung', title: 'Kotti in Veränderung', pct: 20, note: 'Maßnahmen, Projekte, BVG-Initiativen – oft als Reaktion auf das Kriminalitätsnarrativ.' },
+    { id: 'soziales', title: 'Kotti als soziales Problem', pct: 10, note: 'Selten eigenständig – taucht oft als Kontext im Kriminalitätsframe auf, selten als Hauptthema.' },
+    { id: 'kiezleben', title: 'Kotti als Kiez und Alltag', pct: 5, note: 'Das am stärksten unterrepräsentierte Narrativ – Alltag, Kultur und Nachbarschaft erscheinen kaum.' }
+  ];
+  const userOrder = q3State.order.map(n => n.id);
+  document.getElementById('q3-reveal-order').innerHTML = mediaOrder.map((n, i) => {
+    const userPos = userOrder.indexOf(n.id) + 1;
+    const match = userPos === i + 1;
+    return `<div style="display:grid; grid-template-columns:28px 1fr auto; gap:0.75rem; align-items:start; padding:0.75rem 0; border-bottom:1px solid var(--gray);">
+      <div style="width:28px;height:28px;background:var(--black);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0">${i+1}</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.02em">${n.title}</div>
+        <div style="font-size:0.78rem;color:var(--mid);margin-top:0.2rem">${n.note}</div>
+        <div style="margin-top:0.4rem;background:var(--gray2);height:6px;border:1px solid var(--gray)"><div style="height:100%;background:var(--black);width:${n.pct}%"></div></div>
+      </div>
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;color:${match?'var(--success)':'var(--danger)'}">Deine Wahl: ${userPos} ${match?'✓':'✕'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('q3-reveal').style.display = 'block';
+  document.getElementById('q3-reveal').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => {
+    document.getElementById('q3-success').style.display = 'block';
+  }, 400);
+}
+
+function switchTab(id, e) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (e && e.target) e.target.classList.add('active');
+  else document.querySelectorAll('.tab-btn')[['tab-overview','tab-q1','tab-q2','tab-q3','tab-sessions'].indexOf(id)]?.classList.add('active');
+}
+
+const Q_LABELS = {
+  q1a: 'Gleicher Mechanismus, anderer Ort (Görli)',
+  q1b: 'Boulevard vs. lokale Perspektive',
+  q1c: 'taz vs. Boulevard (Liebeserklärung)',
+  q1d: 'Superlativ vs. Statistik (Sat.1)',
+  q1e: 'Lösungsorientierung vs. Eskalation (RBB)'
+};
+
+const N_LABELS = {
+  kriminalitaet: 'Kotti als gefährlicher Ort',
+  revitalisierung: 'Kotti in Veränderung',
+  soziales: 'Kotti als soziales Problem',
+  kiezleben: 'Kotti als Kiez und Alltag'
+};
+
+function bar(pct, color) {
+  return `<div style="display:inline-block;width:120px;height:8px;background:var(--gray2);border:1px solid var(--gray);vertical-align:middle;margin-left:0.5rem"><div style="width:${pct}%;height:100%;background:${color}"></div></div> <span style="font-size:0.75rem;color:var(--mid)">${pct}%</span>`;
+}
+
+function th(label) { return `<th style="text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--mid);padding:0.4rem 0.6rem;border-bottom:2px solid var(--black)">${label}</th>`; }
+function td(val, mono) { return `<td style="padding:0.4rem 0.6rem;font-size:0.82rem;${mono?'font-family:monospace;':''}">${val}</td>`; }
+function tr(cells, bg) { return `<tr style="${bg?'background:'+bg+';':''}">${cells}</tr>`; }
+function table(headers, rows) {
+  return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;border:var(--border-thick)">
+    <thead><tr>${headers.map(th).join('')}</tr></thead>
+    <tbody>${rows.join('')}</tbody>
+  </table></div>`;
+}
+
+// ── QUIZ 1 ───────────────────────────────────────────────────────────────────
+
+function renderQ1Summary(q1s) {
+  if (!q1s.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Daten.</p>';
+
+  // Per-question hit rate
+  const rows = Q1_QUESTIONS.map((q, i) => {
+    const answers = q1s.flatMap(r => (r.answers||[]).filter(a => a.questionId === q.id));
+    const correct = answers.filter(a => a.correct).length;
+    const total = answers.length;
+    const pct = total ? Math.round(correct/total*100) : 0;
+    return tr([td(Q_LABELS[q.id] || `Frage ${i+1}`), td(`${correct} / ${total}`), td(bar(pct, pct >= 50 ? 'var(--success)' : 'var(--danger)'))]);
+  });
+
+  return `<div class="section-label">Quiz 1 · Erkennungsrate pro Schlagzeile</div>
+    ${table(['Schlagzeile (Quelle)', 'Richtig / Gesamt', 'Erkennungsrate'], rows)}
+    <p style="font-size:0.78rem;color:var(--mid);margin-top:0.75rem">${q1s.length} Session(s) · Gesamtdurchschnitt: ${Math.round(q1s.reduce((a,r)=>a+(r.score/r.total*100),0)/q1s.length)}%</p>`;
+}
+
+function renderQ1Detail(q1s) {
+  if (!q1s.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Daten.</p>';
+
+  const rows = q1s.map((r, i) => {
+    const cells = [td(`#${i+1} · ${new Date(r.timestamp).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`)];
+    Q1_QUESTIONS.forEach(q => {
+      const a = (r.answers||[]).find(ans => ans.questionId === q.id);
+      cells.push(td(a ? (a.correct ? '✓' : '✕') : '–'));
+    });
+    cells.push(td(`${r.score}/${r.total}`));
+    if (r.sources?.length) cells.push(td(r.sources.join(', ')));
+    else cells.push(td('–'));
+    return tr(cells);
+  });
+
+  const headers = ['Session', ...Q1_QUESTIONS.map((_,i) => `F${i+1}`), 'Score', 'Quelle'];
+  return `<div class="section-label" style="margin-top:1.5rem">Einzelne Sessions</div>${table(headers, rows)}`;
+}
+
+// ── QUIZ 2 ───────────────────────────────────────────────────────────────────
+
+function renderQ2Summary(q2s) {
+  if (!q2s.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Daten.</p>';
+
+  // Begriff-Häufigkeit: persönlich vs. Medien, Überschneidungen
+  const pFreq = {}, mFreq = {}, overlapFreq = {};
+  q2s.forEach(r => {
+    const p = new Set(r.personal||[]);
+    const m = new Set(r.media||[]);
+    p.forEach(w => pFreq[w] = (pFreq[w]||0)+1);
+    m.forEach(w => mFreq[w] = (mFreq[w]||0)+1);
+    [...p].filter(w => m.has(w)).forEach(w => overlapFreq[w] = (overlapFreq[w]||0)+1);
+  });
+
+  const allWords = [...new Set([...Object.keys(pFreq), ...Object.keys(mFreq)])].sort((a,b) => ((mFreq[b]||0)+(pFreq[b]||0)) - ((mFreq[a]||0)+(pFreq[a]||0)));
+
+  const rows = allWords.map(w => {
+    const p = pFreq[w]||0, m = mFreq[w]||0, ov = overlapFreq[w]||0;
+    const type = Q2_WORDS.find(x=>x.word===w)?.type || 'offen';
+    return tr([td(w), td(p), td(m), td(ov > 0 ? `<strong>${ov}</strong>` : '–')]);
+  });
+
+  return `<div class="section-label">Quiz 2 · Begriffe (${q2s.length} Sessions)</div>
+    ${table(['Begriff','Persönlich','Medienerwartung','Überschneidung'], rows)}`;
+}
+
+function renderQ2Detail(q2s) {
+  if (!q2s.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Daten.</p>';
+
+  const rows = q2s.map((r, i) => {
+    const overlap = (r.overlap||[...new Set((r.personal||[]).filter(w => (r.media||[]).includes(w)))]).join(', ') || '–';
+    return tr([
+      td(`#${i+1} · ${new Date(r.timestamp).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`),
+      td((r.personal||[]).join(', ')),
+      td((r.media||[]).join(', ')),
+      td(overlap),
+      td(r.sources?.join(', ')||'–')
+    ]);
+  });
+
+  return `<div class="section-label" style="margin-top:1.5rem">Einzelne Sessions</div>
+    ${table(['Session','Persönliche Wahl','Medienerwartung','Überschneidungen','Quelle'], rows)}`;
+}
+
+// ── QUIZ 3 ───────────────────────────────────────────────────────────────────
+
+function renderQ3Summary(q3s) {
+  if (!q3s.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Daten.</p>';
+
+  // Average rank per narrative
+  const rankSum = {}, rankCount = {};
+  Q3_NARRATIVES.forEach(n => { rankSum[n.id] = 0; rankCount[n.id] = 0; });
+  q3s.forEach(r => {
+    (r.narrativeOrder||[]).forEach((id, pos) => {
+      rankSum[id] = (rankSum[id]||0) + (pos+1);
+      rankCount[id] = (rankCount[id]||0) + 1;
+    });
+  });
+
+  const rowData = Q3_NARRATIVES.map(n => ({
+    label: N_LABELS[n.id],
+    avg: rankCount[n.id] ? rankSum[n.id]/rankCount[n.id] : 99
+  })).sort((a,b) => a.avg - b.avg);
+
+  const rows = rowData.map(d => tr([td(d.label), td(d.avg === 99 ? '–' : d.avg.toFixed(1))]));
+
+  // Source frequency
+  const srcFreq = {};
+  q3s.forEach(r => (r.sources||[]).forEach(s => srcFreq[s] = (srcFreq[s]||0)+1));
+  const srcRows = Object.entries(srcFreq).sort((a,b)=>b[1]-a[1])
+    .map(([s,n]) => tr([td(s), td(n), td(bar(Math.round(n/q3s.length*100), 'var(--black)'))]));
+
+  return `<div class="section-label">Quiz 3 · Ø Rang pro Narrativ (${q3s.length} Sessions)</div>
+    ${table(['Narrativ','Ø Rang (1=häufigste)'], rows)}
+    ${srcRows.length ? `<div class="section-label" style="margin-top:1.5rem">Informationsquellen</div>${table(['Quelle','Nennungen','Anteil'], srcRows)}` : ''}`;
+}
+
+function renderQ3Detail(q3s) {
+  if (!q3s.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Daten.</p>';
+
+  const rows = q3s.map((r, i) => {
+    const order = (r.narrativeOrder||[]).map((id,pos) => `${pos+1}. ${N_LABELS[id]||id}`).join(' → ');
+    return tr([
+      td(`#${i+1} · ${new Date(r.timestamp).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`),
+      td(order),
+      td(r.sources?.join(', ')||'–')
+    ]);
+  });
+
+  return `<div class="section-label" style="margin-top:1.5rem">Einzelne Sessions</div>
+    ${table(['Session','Reihenfolge','Informationsquellen'], rows)}`;
+}
+
+function renderSessions(results) {
+  if (!results.length) return '<p style="color:var(--mid);font-size:0.85rem">Noch keine Sessions.</p>';
+  return results.slice().reverse().map((r,i) => `
+    <div class="session-item">
+      <div class="session-meta">
+        <span>#${results.length-i} · ${new Date(r.timestamp).toLocaleString('de-DE')}</span>
+        <span>Quiz ${r.type.replace('q','')}</span>
+        ${r.sources?.length ? `<span>${r.sources.join(', ')}</span>` : ''}
+      </div>
+      ${r.type==='q1' ? `<span style="font-size:0.82rem;color:var(--mid)">${r.score}/${r.total} richtig · ${(r.answers||[]).map(a=>`${a.questionId}: ${a.correct?'✓':'✕'}`).join(' · ')}</span>` : ''}
+      ${r.type==='q2' ? `<span style="font-size:0.82rem;color:var(--mid)">Persönlich: ${(r.personal||[]).join(', ')||'–'}<br>Medien: ${(r.media||[]).join(', ')||'–'}<br>Überschneidung: ${(r.overlap||[]).join(', ')||'–'}</span>` : ''}
+      ${r.type==='q3' ? `<span style="font-size:0.82rem;color:var(--mid)">${(r.narrativeOrder||[]).map((id,i)=>`${i+1}. ${N_LABELS[id]||id}`).join(' → ')}</span>` : ''}
+    </div>`).join('');
+}
+function renderAdmin() {
+  const results = loadResults();
+  const q1s = results.filter(r => r.type === 'q1');
+  const q2s = results.filter(r => r.type === 'q2');
+  const q3s = results.filter(r => r.type === 'q3');
+  document.getElementById('admin-total').textContent = results.length;
+  document.getElementById('admin-q1-summary').innerHTML = renderQ1Summary(q1s);
+  document.getElementById('admin-q2-summary').innerHTML = renderQ2Summary(q2s);
+  document.getElementById('admin-q3-summary').innerHTML = renderQ3Summary(q3s);
+  document.getElementById('admin-q1-detail').innerHTML = renderQ1Detail(q1s);
+  document.getElementById('admin-q2-detail').innerHTML = renderQ2Detail(q2s);
+  document.getElementById('admin-q3-detail').innerHTML = renderQ3Detail(q3s);
+  document.getElementById('admin-sessions').innerHTML = renderSessions(results);
+}
+
+function exportData() {
+  const results = loadResults();
+  if (!results.length) { alert('Keine Daten vorhanden.'); return; }
+  let csv = 'timestamp,type,detail\n';
+  results.forEach(r => { csv += `"${r.timestamp}","${r.type}","${JSON.stringify(r).replace(/"/g,'""')}"\n`; });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kotti_export_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+initQ1(); initQ2(); initQ3();
+</script>
+</body>
+</html>
