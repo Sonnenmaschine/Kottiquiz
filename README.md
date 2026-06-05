@@ -14,10 +14,12 @@ The tool consists of three interactive formats, designed to run on a tablet at a
 Five pairs of headlines. One is genuine, one is either invented or sourced from coverage of a different location with the place name swapped. The goal: show that sensationalist framing follows predictable patterns – and that those patterns travel across cities and outlets.
 
 **Format 2 – How do you describe Kotti?**
-Two steps: first, select words you personally associate with the Kottbusser Tor. Then, select which words you expect to find in media coverage. The comparison reveals the gap between lived experience and media image.
+Two steps: first, select words you personally associate with the Kottbusser Tor. Then, select which words you expect to find in media coverage. The comparison reveals the gap between lived experience and media image, followed by a bar chart of how frequently each term actually appears in the analysed coverage.
 
 **Format 3 – Sort the narratives**
 Four recurring media narratives about Kotti, sorted by the participant from most to least frequent in news coverage. After submitting, the tool reveals the actual distribution based on a corpus analysis of 40 articles.
+
+A closing screen invites participants to engage further – with a guided Kotti walk, the BVG safety tour, and the local association kotti e.V. (via QR code).
 
 ---
 
@@ -29,7 +31,7 @@ The analysis is based on a corpus of 40 articles published between 2024 and 2025
 
 The categorisation of terms (e.g. which words are typical of tabloid vs. local coverage) reflects analytical decisions made in the coding process and should be read as interpretive, not exhaustive.
 
-A full discussion of methodology, sources, and limitations will published by the accompanying seminar paper later this year.
+A full discussion of methodology, sources, and limitations will be published with the accompanying seminar paper later this year.
 
 ---
 
@@ -39,13 +41,16 @@ A full discussion of methodology, sources, and limitations will published by the
 - Runs entirely in the browser
 - Response data is stored in `localStorage` on the device – nothing is sent to a server
 - An admin view (accessible via a link at the bottom of the start screen) shows aggregated results per format and allows CSV export
-- Designed for tablet use (768px+), also works on desktop
+- Light and dark mode (toggle in the header; preference is saved locally)
+- Designed for tablet use, responsive down to mobile
 
 ---
 
-## Design
+## Design & accessibility
 
-The interface uses a brutalist aesthetic with high-contrast black and white, no rounded corners, and uppercase typography. Colour is used semantically only (KERN UX design system colour tokens for success/error states).
+The interface uses a brutalist aesthetic with high-contrast black and white, no rounded corners, and thick borders. Colour is used semantically only (KERN UX design system colour tokens for success/error states).
+
+Accessibility was a priority: both light and dark mode meet WCAG 2.1 / BITV AA contrast requirements, touch targets are at least 44px, and text is set without all-caps for better legibility.
 
 ---
 
@@ -60,7 +65,5 @@ For a more complete picture, please refer to the upcoming seminar paper.
 ## Contact
 
 Thomas Reimer
-
 HTW Berlin / Public Design
-
 thomas.reimer@student.htw-berlin.de
